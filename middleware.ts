@@ -1,27 +1,16 @@
-import { authMiddleware } from "@clerk/nextjs";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// ✅ Middleware جاهز بدون كسر السيرفر
-export default authMiddleware({
-  publicRoutes: [
-    "/favicon.ico",
-    "/logo.svg",
-    "/logo.png",
-    "/_next/static/(.*)",
-    "/api/(.*)",
-  ],
-  ignoredRoutes: [
-    "/_next/image/(.*)",
-    "/_next/static/(.*)",
-    "/favicon.ico",
-    "/logo.svg",
-    "/logo.png",
-  ],
-  afterAuth(auth, req) {
-    // ✅ تحمي فقط الصفحات وليس API أو static
-    if (!auth.userId && req.nextUrl.pathname.startsWith("/dashboard")) {
-      return Response.redirect(new URL("/sign-in", req.url));
-    }
-  },
+const isProtectedRoute = createRouteMatcher([
+  "/dashboard(.*)",
+  "/profile(.*)",
+  "/meeting(.*)",
+  "/recordings(.*)",
+]);
+
+export default clerkMiddleware((auth, req) => {
+  if (isProtectedRoute(req)) {
+    auth().protect();
+  }
 });
 
 export const config = {
