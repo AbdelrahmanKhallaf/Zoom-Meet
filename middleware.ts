@@ -10,11 +10,12 @@ const protectedRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware((auth, req) => {
-  if (protectedRoute(req)) {
-    auth().protect();
-  }
+  if (protectedRoute(req)) auth().protect();
 });
 
+
 export const config = {
-  matcher: ['/((?!_next|.*\\..*).*)', '/', '/(api|trpc)(.*)'],
+  matcher: [
+'/((?!api|_next/static|_next/image|favicon.ico|logo.svg|logo.png).*)',
+  ],
 };
